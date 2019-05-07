@@ -1,0 +1,12 @@
+FROM debian
+WORKDIR /usr/src/build
+
+ENV PYTHONUNBUFFERED 1
+
+RUN dpkg --add-architecture armhf && \
+    apt update && \
+    apt install -y devscripts crossbuild-essential-armhf binutils-multiarch build-essential:native
+RUN apt install -y python3-all:armhf python3:armhf python3-setuptools:armhf
+COPY . /usr/src/build
+CMD debuild  -aarmhf -i -us -uc -b && \
+    cp -v ../*.deb /usr/src/deb/

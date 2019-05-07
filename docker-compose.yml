@@ -1,0 +1,23 @@
+version: '3'
+services:
+  deb-i386:
+    build:
+      context: .
+      dockerfile: Dockerfile-i386
+    volumes:
+      - .:/usr/src/app
+      - /tmp/deb:/usr/src/deb
+  deb-amd64:
+    build:
+      context: .
+      dockerfile: Dockerfile-amd64
+    volumes:
+      - .:/usr/src/app
+      - /tmp/deb:/usr/src/deb
+  deb-armhf:
+    build:
+      context: .
+      dockerfile: Dockerfile-armhf
+    volumes:
+      - .:/usr/src/app
+      - /tmp/deb:/usr/src/deb

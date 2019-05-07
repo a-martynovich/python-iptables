@@ -1,35 +1,46 @@
 version: 2
 jobs:
   build:
+    working_directory: /app
     docker:
-      - image: circleci/python:3.6.8-stretch
+      - image: docker:18.03.1-ce-git
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Install dependencies
           command: |
-            sudo dpkg --add-architecture armhf
-            sudo apt update
-            sudo apt install devscripts crossbuild-essential-armhf binutils-multiarch
+            apk add --no-cache \
+              python3 py3-pynacl py3-cffi py3-bcrypt py3-cryptography
+            python3 -m ensurepip
+            pip3 install docker-compose
       - run:
-          name: Build dpkg amd64
+          name: Build application Docker image
           command: |
-            sudo apt install build-essential:native python3-all python3-setuptools
-            debuild  -i -us -uc -b
-            mkdir -p /tmp/deb
-            mv ../*.deb /tmp/deb
+            docker-compose build
       - run:
-          name: Build dpkg armhf
+          name: Run application Docker image
           command: |
-            sudo apt install python3-all:armhf python3:armhf
-            debuild  -i -us -uc -b
-            mkdir -p /tmp/deb
-            mv ../*.deb /tmp/deb
-      - deploy:
-          command: |
-              if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                package_cloud push wott/python-iptables/debian/stretch /tmp/deb/*.deb
-                package_cloud push wott/python-iptables/raspbian/stretch /tmp/deb/*.deb
-              fi
+            docker-compose up
       - store_artifacts:
           path: /tmp/deb
+      - deploy:
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              package_cloud push wott/python-iptables/debian/stretch /tmp/deb/*.deb
+              package_cloud push wott/python-iptables/raspbian/stretch /tmp/deb/*.deb
+            fi
+
+
+#apt install devscripts crossbuild-essential-armhf binutils-multiarch
+#
+#apt install python3-all
+#debuild -aamd64 -i -us -uc -b
+#
+#apt install python3-all:i386
+#ln -s `which objcopy` /usr/bin/i686-linux-gnu-objcopy
+#ln -s `which strip` /usr/bin/i686-linux-gnu-strip
+#debuild   --set-envvar LDSHARED="$(which gcc) -pthread -shared"  --set-envvar CC=`which gcc` --set-envvar CFLAGS="-m32" -ai386 -i -us -uc -b
+#
+#apt install -y python3-all:armhf python3:armhf
+#debuild -aarmhf -i -us -uc -b
