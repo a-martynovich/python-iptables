@@ -8,16 +8,20 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apt-get install -y gcc python3-dev python3-dbg pkg-config \
-              nmap iptables devscripts ruby2.3-dev rubygems \
-              build-essential:native python-setuptools python3-all python3-setuptools
+            sudo dpkg --add-architecture armhf
+            sudo apt update
+            sudo apt install devscripts crossbuild-essential-armhf binutils-multiarch
       - run:
-          name: Install PackageCloud
+          name: Build dpkg amd64
           command: |
-            sudo gem install rake package_cloud
+            sudo apt install build-essential:native python3-all python3-setuptools
+            debuild  -i -us -uc -b
+            mkdir -p /tmp/deb
+            mv ../*.deb /tmp/deb
       - run:
-          name: Build dpkg packages
+          name: Build dpkg armhf
           command: |
+            sudo apt install python3-all:armhf python3:armhf
             debuild  -i -us -uc -b
             mkdir -p /tmp/deb
             mv ../*.deb /tmp/deb

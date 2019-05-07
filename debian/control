@@ -5,8 +5,6 @@ Maintainer: Juliano Martinez <juliano@martinez.io>
 Build-Depends:
  debhelper (>= 8),
  dh-python,
- python3-dbg,
- python-setuptools,
  python3-all,
  python3-setuptools
 Standards-Version: 3.9.8
@@ -16,12 +14,5 @@ Homepage: https://github.com/ldx/python-iptables
 Package: python3-iptables
 Architecture: any
 Depends: ${python3:Depends}, ${shlibs:Depends}, ${misc:Depends}, python3-pkg-resources
-Description: Python3 bindings for iptables
-
-Package: python3-iptables-dbg
-Section: debug
-Priority: extra
-Architecture: any
-Depends: ${python3:Depends}, ${shlibs:Depends}, ${misc:Depends}, python3-iptables (= ${binary:Version})
 Description: Python3 bindings for iptables
 
