@@ -1,14 +1,11 @@
-FROM debian
+FROM i386/python:3.6-stretch
 WORKDIR /usr/src/build
 
 ENV PYTHONUNBUFFERED 1
 
-RUN dpkg --add-architecture i386 && \
-    apt update && \
-    apt install -y devscripts crossbuild-essential-armhf binutils-multiarch build-essential:native
-RUN ln -s `which objcopy` /usr/bin/i686-linux-gnu-objcopy
-RUN ln -s `which strip` /usr/bin/i686-linux-gnu-strip
-RUN apt install -y python3-all:i386 python3:i386 python3-setuptools:i386 g++-multilib
+RUN apt update
+RUN apt install -y devscripts build-essential:native python3-all python3-setuptools
+
 COPY . /usr/src/build
-CMD debuild --set-envvar LDSHARED="$(which gcc) -pthread -shared"  --set-envvar CC=`which gcc` --set-envvar CFLAGS="-m32" -ai386 -i -us -uc -b && \
+CMD debuild -i -us -uc -b && \
     cp -v ../*.deb /usr/src/deb/
